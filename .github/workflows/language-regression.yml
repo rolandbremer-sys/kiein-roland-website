@@ -1,0 +1,30 @@
+name: Language Regression DE CZ EN
+on:
+  push:
+    paths:
+      - 'script.js'
+      - 'index.html'
+      - 'tests/language.test.cjs'
+      - '.github/workflows/language-regression.yml'
+  pull_request:
+    paths:
+      - 'script.js'
+      - 'index.html'
+      - 'tests/language.test.cjs'
+      - '.github/workflows/language-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  language:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: node --check script.js
+      - name: Language persistence and translation regression
+        run: node --test tests/language.test.cjs
