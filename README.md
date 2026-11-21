@@ -1,6 +1,6 @@
 # KIein Roland – GitHub Pages Website
 
-A static, mobile-responsive, three-language (DE / CZ / EN) marketing preview with a **synthetic** interactive demonstration. No dependencies, cookies, tracking, payments, accounts, external images or real elevator connections.
+A static, mobile-responsive, three-language (DE / CZ / EN) marketing preview with a **synthetic** interactive demonstration. The website has no runtime dependencies, cookies, tracking, payments, accounts, external images or real elevator connections.
 
 ## Publish to GitHub Pages
 
@@ -16,7 +16,7 @@ A static, mobile-responsive, three-language (DE / CZ / EN) marketing preview wit
 - Confirm ownership and licensing of all content and product claims.
 - Replace mock interface with **real approved screenshots** only when verified.
 - Connect a real demo only after security review; do not connect production data to the public mock demo.
-- Pricing is indicative; **there is no checkout**.
+- The preview shows the ten approved net EUR plans in DE, CZ and EN. Booking opens after product approval. Run `node --test tests/language.test.cjs` to verify price and interval parity and the translated billing disclosures.
 - Static demo runs entirely in the browser and is not a functioning maintenance or diagnostic app.
 
 ## Smoke tests
@@ -26,3 +26,7 @@ A static, mobile-responsive, three-language (DE / CZ / EN) marketing preview wit
 - Simulated scenarios: door, stale, identity mismatch, generic status.
 - Reload does not persist user event data; language preference may be stored locally.
 - No external JS, CSS, fonts or network requests are needed.
+
+## Browser acceptance
+
+Use `npm ci`, `npx playwright install chromium firefox webkit` and `npm run test:browser`. The suite serves the static preview on loopback under the project subpath and checks language changes, reload, demo text, mobile pricing and relative assets in each browser engine. Playwright runs only during testing.
