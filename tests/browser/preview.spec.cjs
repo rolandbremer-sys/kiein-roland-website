@@ -22,6 +22,8 @@ test('project subpath loads assets and keeps Czech across refresh after a langua
   await page.reload();
   await expect(picker).toHaveValue('cs');
   await expect(page.locator('html')).toHaveAttribute('lang', 'cs');
+  await expect(page.getByRole('navigation', { name: 'Hlavní navigace' })).toBeVisible();
+  await expect(page.getByRole('combobox', { name: 'Vyberte jazyk' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Spustit simulovanou kontrolu' }).click();
   await expect(page.locator('#demoResult')).toContainText('Událost dveří');

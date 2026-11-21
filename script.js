@@ -12,6 +12,16 @@ Object.assign(copy.en, {offline:"Offline-first concept",neutral:"Manufacturer-in
 Object.assign(copy.cs, {offline:"Koncept offline provozu",neutral:"Nezávislé na výrobci",transparent:"Transparentní stav",mockAsset:"Přehled zařízení",demoData:"DEMO ÚDAJE",demoBuilding:"Ukázková budova · 5 stanic",notVerified:"NEOVĚŘENO",controller:"Řídicí systém",connection:"Připojení",evidence:"Podklady",mockEvent1:"Přijata událost dveří",mockEvent1Sub:"Pozorování – příčina nepotvrzena",mockEvent2:"Ověřit identitu zařízení",mockEvent2Sub:"Schválení až po ověření",mockEvent3:"Offline protokol",mockEvent3Sub:"Lokálně uložený testovací záznam",mockFoot:"Pouze koncept – bez spojení se skutečným výtahem",strip1:"Vytvořeno pro praxi",strip2:"Bezpečnost před automatizací",strip3:"Znalosti s dohledatelným zdrojem",forEveryone:"JEDNA PLATFORMA. TŘI POHLEDY.",featuresText:"Správné informace ve správný čas.",techTitle:"Pro techniky",techText:"Strukturované záznamy o zařízení, údržbě a poruchách. Pozorování jsou oddělena od domněnek.",techFoot:"Terénní práce a diagnostika",firmTitle:"Pro servisní firmy",firmText:"Jednotné postupy a dohledatelné týmové zprávy.",firmFoot:"Týmy a servisní procesy",ownerTitle:"Pro provozovatele",ownerText:"Přehled zařízení, termíny údržby a srozumitelné informace o stavu.",ownerFoot:"Portfolio a přehlednost",interactive:"INTERAKTIVNÍ UKÁZKA",noticeTitle:"Důležité upozornění",noticeText:"Pouze simulované postupy. Nejde o bezpečný pracovní návod.",scenario:"TESTOVACÍ SCÉNÁŘ",demoScenario:"Událost dveří · DEMO-LIFT-001",choose:"Vyberte simulovanou událost",optDoor:"Událost dveří",optStale:"Zastaralé údaje",optIdentity:"Neznámá revize řízení",optNormal:"Stavové hlášení",demoDisclaimer:"Žádná diagnostika skutečných zařízení. Bez spojení s řízením.",responsible:"ODPOVĚDNOST JE FUNKCE",trustTitle:"Důvěra vzniká ověřitelnou prací.",trustText:"Bezpečnost, zdroje a odpovědnost mají přednost před rychlými odpověďmi.",point1:"Bezpečnostní hranice",point1Text:"Žádné automatické zásahy do skutečných bezpečnostních obvodů.",point2:"Dohledatelná data",point2Text:"Zdroje, časové údaje a nejistoty zůstávají viditelné.",point3:"Poctivý stav vývoje",point3Text:"Laboratorní test není schválení produktu.",human:"TECHNIKA. BUSINESS. LIDÉ.",ctaTitle:"Dobrá technika má pomáhat lidem.",ctaText:"Nástroj pro lidi, kteří nesou odpovědnost.",ctaButton:"Vyzkoušet simulovanou ukázku",footerText:"Produktová ukázka ve vývoji. Nejde o schválenou bezpečnostní ani diagnostickou aplikaci.",footerLinks:"Informace",navFeatures2:"Funkce",navDemo2:"Ukázka",navPrices2:"Ceny",legal:"Právní informace",legalPending:"Před zahájením prodeje je nutné doplnit identifikační údaje, ochranu soukromí a podmínky.",footerStatus:"Veřejná ukázka"});
 
 Object.assign(copy.de, {
+  skipContent: "Zum Inhalt",
+  brandHome: "KIein Roland Startseite",
+  mainNavigation: "Hauptnavigation",
+  selectLanguage: "Sprache auswählen",
+  mockFieldView: "KIein Roland / MONTEURANSICHT",
+  mockSimulation: "SIMULATION",
+  mockAssetId: "ANLAGEN-ID",
+  mockSimulated: "SIMULIERT",
+  mockDemoOnly: "NUR DEMO",
+  demoSandbox: "TESTUMGEBUNG",
   pricingTitle: "Tarife",
   pricingText: "Alle Preise in EUR netto, zuzüglich gegebenenfalls anfallender Umsatzsteuer. Buchung erst nach Produktfreigabe.",
   servicePricing: "Für Monteure und Servicefirmen",
@@ -32,6 +42,16 @@ Object.assign(copy.de, {
   owner250Desc: "Bis zu 250 Aufzüge.",
 });
 Object.assign(copy.cs, {
+  skipContent: "Přejít na obsah",
+  brandHome: "Úvodní stránka KIein Roland",
+  mainNavigation: "Hlavní navigace",
+  selectLanguage: "Vyberte jazyk",
+  mockFieldView: "KIein Roland / ZOBRAZENÍ PRO TECHNIKY",
+  mockSimulation: "SIMULACE",
+  mockAssetId: "ID ZAŘÍZENÍ",
+  mockSimulated: "SIMULOVÁNO",
+  mockDemoOnly: "POUZE UKÁZKA",
+  demoSandbox: "TESTOVACÍ PROSTŘEDÍ",
   pricingTitle: "Tarify",
   pricingText: "Všechny ceny jsou v EUR bez DPH. Objednávky budou možné po schválení produktu.",
   servicePricing: "Pro techniky a servisní firmy",
@@ -52,6 +72,16 @@ Object.assign(copy.cs, {
   pricingFine: "Podnikové tarify pro více než 50 techniků a portfolia s více než 250 výtahy na vyžádání.",
 });
 Object.assign(copy.en, {
+  skipContent: "Skip to content",
+  brandHome: "KIein Roland home",
+  mainNavigation: "Main navigation",
+  selectLanguage: "Choose a language",
+  mockFieldView: "KIein Roland / FIELD VIEW",
+  mockSimulation: "SIMULATION",
+  mockAssetId: "ASSET ID",
+  mockSimulated: "SIMULATED",
+  mockDemoOnly: "DEMO ONLY",
+  demoSandbox: "SANDBOX",
   pricingTitle: "Plans and pricing",
   pricingText: "All prices are in EUR, exclusive of applicable VAT. Booking will open after product approval.",
   servicePricing: "For technicians and service companies",
@@ -88,13 +118,19 @@ function selectedLanguage() {
   const browser=(navigator.language||"").toLowerCase().split("-")[0];
   return Object.prototype.hasOwnProperty.call(copy,browser)?browser:"en";
 }
+function translation(lang, key) {
+  const value=copy[lang][key];
+  if(value===undefined) throw new Error("Missing translation "+lang+":"+key);
+  return value;
+}
 function setLanguage(lang) {
   if(!Object.prototype.hasOwnProperty.call(copy,lang)) return false;
   document.documentElement.lang=lang;
   document.querySelectorAll("[data-i]").forEach(el=>{
-    const value=copy[lang][el.dataset.i];
-    if(value===undefined) throw new Error("Missing translation "+lang+":"+el.dataset.i);
-    el.textContent=value;
+    el.textContent=translation(lang,el.dataset.i);
+  });
+  document.querySelectorAll("[data-i-aria]").forEach(el=>{
+    el.setAttribute("aria-label",translation(lang,el.dataset.iAria));
   });
   const picker=document.getElementById("lang");
   if(picker) picker.value=lang;

@@ -5,24 +5,33 @@ const vm=require('node:vm');
 const html=fs.readFileSync('index.html','utf8');
 const code=fs.readFileSync('script.js','utf8');
 const keys=[...new Set([...html.matchAll(/data-i="([^"]+)"/g)].map(x=>x[1]))];
+const ariaKeys=[...new Set([...html.matchAll(/data-i-aria="([^"]+)"/g)].map(x=>x[1]))];
 function page(storage={},browser='cs-CZ',search='') {
  const nodes=keys.map(k=>({dataset:{i:k},textContent:''}));
+ const namedNodes=ariaKeys.map(key=>({
+  dataset:{iAria:key},
+  setAttribute(name,value) {
+   assert.equal(name,'aria-label');
+   this.label=value;
+  },
+ }));
  const els={lang:{value:'de',addEventListener(ev,fn){this.change=fn}},
  runDemo:{addEventListener(ev,fn){this.click=fn}},
  scenarioSelect:{value:'door'},demoResult:{textContent:'',dataset:{}},
  year:{textContent:''}};
- const document={documentElement:{lang:'de'},querySelectorAll(){return nodes},getElementById(id){return els[id]},addEventListener(ev,fn){if(ev==='DOMContentLoaded')this.ready=fn}};
+ const document={documentElement:{lang:'de'},querySelectorAll(selector){return selector==="[data-i-aria]"?namedNodes:nodes},getElementById(id){return els[id]},addEventListener(ev,fn){if(ev==='DOMContentLoaded')this.ready=fn}};
  const localStorage={getItem(k){return storage[k]??null},setItem(k,v){storage[k]=v}};
  const context={document,localStorage,navigator:{language:browser},location:{search},URLSearchParams,Date,console};
  vm.createContext(context);vm.runInContext(code,context);document.ready();
- return {context,document,els,nodes,storage};
+ return {context,document,els,nodes,namedNodes,storage};
 }
-test('all marked text translated in CZ, DE and EN',()=>{
+test('all marked text and accessible names translated in CZ, DE and EN',()=>{
  for(const lang of ['cs','de','en']){
   const p=page({},lang+'-CZ');
   assert.equal(p.document.documentElement.lang,lang);
   assert.equal(p.nodes.length,keys.length);
   assert.ok(p.nodes.every(n=>n.textContent.length>0));
+  assert.ok(p.namedNodes.every(n=>n.label.length>0));
  }
 });
 test('Czech selection persists across reload even on German browser',()=>{
