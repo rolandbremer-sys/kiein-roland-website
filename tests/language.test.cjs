@@ -20,8 +20,13 @@ function page(storage={},browser='cs-CZ',search='') {
  scenarioSelect:{value:'door'},demoResult:{textContent:'',dataset:{}},
  year:{textContent:''}};
  const document={documentElement:{lang:'de'},querySelectorAll(selector){return selector==="[data-i-aria]"?namedNodes:nodes},getElementById(id){return els[id]},addEventListener(ev,fn){if(ev==='DOMContentLoaded')this.ready=fn}};
- const localStorage={getItem(k){return storage[k]??null},setItem(k,v){storage[k]=v}};
- const context={document,localStorage,navigator:{language:browser},location:{search},URLSearchParams,Date,console};
+ const localStorage={
+  getItem(k){if(!storage)throw Error('denied');return storage[k]??null},
+  setItem(k,v){if(!storage)throw Error('denied');storage[k]=v},
+ };
+ const location=new URL('https://example.test/kiein-roland-website/'+search);
+ const history={state:null,replaceState(_state,_title,url){location.href=url}};
+ const context={document,localStorage,navigator:{language:browser},location,history,URL,URLSearchParams,Date,console};
  vm.createContext(context);vm.runInContext(code,context);document.ready();
  return {context,document,els,nodes,namedNodes,storage};
 }
@@ -53,10 +58,16 @@ test('unsupported stored language never changes to German unexpectedly',()=>{
  const p=page({'kiein-roland-language-v1':'xx'},'cs-CZ');
  assert.equal(p.document.documentElement.lang,'cs');
 });
-test('storage denied does not crash',()=>{
- const p=page({},'cs-CZ');
- Object.defineProperty(p.context,'localStorage',{value:{getItem(){throw Error('denied')},setItem(){throw Error('denied')}}});
- assert.doesNotThrow(()=>vm.runInContext("setLanguage('cs')",p.context));
+test('Czech selection survives reload when browser storage is denied',()=>{
+ const first=page(null,'de-DE','?source=preview#pricing');
+ assert.equal(first.els.lang.value,'de');
+ first.els.lang.value='cs';
+ first.els.lang.change();
+ assert.equal(first.context.location.searchParams.get('source'),'preview');
+ assert.equal(first.context.location.hash,'#pricing');
+ const restarted=page(null,'de-DE',first.context.location.search+first.context.location.hash);
+ assert.equal(restarted.document.documentElement.lang,'cs');
+ assert.equal(restarted.els.lang.value,'cs');
 });
 test('invalid change cannot override selected language',()=>{
  const p=page({},'cs-CZ');

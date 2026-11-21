@@ -123,7 +123,7 @@ function translation(lang, key) {
   if(value===undefined) throw new Error("Missing translation "+lang+":"+key);
   return value;
 }
-function setLanguage(lang) {
+function setLanguage(lang, rememberInUrl = false) {
   if(!Object.prototype.hasOwnProperty.call(copy,lang)) return false;
   document.documentElement.lang=lang;
   document.querySelectorAll("[data-i]").forEach(el=>{
@@ -134,7 +134,17 @@ function setLanguage(lang) {
   });
   const picker=document.getElementById("lang");
   if(picker) picker.value=lang;
-  try { localStorage.setItem(LANGUAGE_KEY,lang); } catch (_) { /* private mode */ }
+  try {
+    localStorage.setItem(LANGUAGE_KEY,lang);
+  } catch (_) {
+    if(rememberInUrl) {
+      try {
+        const url=new URL(location.href);
+        url.searchParams.set("lang",lang);
+        history.replaceState(history.state,"",url);
+      } catch (_) { /* current document still holds the selected language */ }
+    }
+  }
   const result=document.getElementById("demoResult");
   if(result && result.dataset.scenario) {
     result.textContent=outcomes[lang][result.dataset.scenario];
@@ -143,7 +153,7 @@ function setLanguage(lang) {
 }
 document.addEventListener("DOMContentLoaded",()=>{
   const picker=document.getElementById("lang");
-  if(picker) picker.addEventListener("change",()=>setLanguage(picker.value));
+  if(picker) picker.addEventListener("change",()=>setLanguage(picker.value,true));
   setLanguage(selectedLanguage());
   const run=document.getElementById("runDemo");
   if(run) run.addEventListener("click",()=>{

@@ -50,3 +50,28 @@ test('mobile pricing displays all plans and the recurring weekly disclosure with
   }));
   expect(viewport.sectionWidth).toBeLessThanOrEqual(viewport.viewportWidth);
 });
+
+test('Czech survives fragment navigation and reload when storage access is blocked', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, 'localStorage', {
+      get() { throw new DOMException('Storage is blocked in this context', 'SecurityError'); },
+    });
+  });
+  await page.goto(projectPath + '?lang=de&source=preview');
+  const picker = page.locator('#lang');
+  await expect(picker).toHaveValue('de');
+  await picker.selectOption('cs');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'cs');
+
+  await page.getByRole('navigation', { name: 'Hlavní navigace' }).getByRole('link', { name: 'Ceny' }).click();
+  await expect(page).toHaveURL(url => url.hash === '#pricing' &&
+    url.searchParams.get('lang') === 'cs' && url.searchParams.get('source') === 'preview');
+  await page.reload();
+  await expect(picker).toHaveValue('cs');
+  await expect(page.getByRole('heading', { name: 'Tarify', exact: true })).toBeVisible();
+
+  await page.getByRole('navigation', { name: 'Hlavní navigace' }).getByRole('link', { name: 'Ukázka' }).click();
+  await expect(page).toHaveURL(url => url.hash === '#demo' && url.searchParams.get('lang') === 'cs');
+  await page.getByRole('button', { name: 'Spustit simulovanou kontrolu' }).click();
+  await expect(page.locator('#demoResult')).toContainText('Událost dveří');
+});
