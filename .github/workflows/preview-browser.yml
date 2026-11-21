@@ -1,0 +1,37 @@
+name: Preview browser acceptance
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'script.js'
+      - 'styles.css'
+      - 'package*.json'
+      - 'playwright.config.cjs'
+      - 'tests/browser/**'
+      - '.github/workflows/preview-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preview-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install locked test dependencies
+        run: npm ci
+      - name: Install browser for preview acceptance
+        run: npx playwright install --with-deps "$PREVIEW_BROWSER"
+        env:
+          PREVIEW_BROWSER: ${{ matrix.browser }}
+      - name: Test pricing, language persistence and static assets in the browser
+        run: npm run test:browser -- --project="$PREVIEW_BROWSER"
+        env:
+          PREVIEW_BROWSER: ${{ matrix.browser }}

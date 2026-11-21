@@ -1,6 +1,6 @@
 # KIein Roland – GitHub Pages Website
 
-A static, mobile-responsive, three-language (DE / CZ / EN) marketing preview with a **synthetic** interactive demonstration. No dependencies, cookies, tracking, payments, accounts, external images or real elevator connections.
+A static, mobile-responsive, three-language (DE / CZ / EN) marketing preview with a **synthetic** interactive demonstration. The website has no runtime dependencies, cookies, tracking, payments, accounts, external images or real elevator connections.
 
 ## Publish to GitHub Pages
 
@@ -26,3 +26,7 @@ A static, mobile-responsive, three-language (DE / CZ / EN) marketing preview wit
 - Simulated scenarios: door, stale, identity mismatch, generic status.
 - Reload does not persist user event data; language preference may be stored locally.
 - No external JS, CSS, fonts or network requests are needed.
+
+## Browser acceptance
+
+Use `npm ci`, `npx playwright install chromium firefox webkit` and `npm run test:browser`. The suite serves the static preview on loopback under the project subpath and checks language changes, reload, demo text, mobile pricing and relative assets in each browser engine. Playwright runs only during testing.

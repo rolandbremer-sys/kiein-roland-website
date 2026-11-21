@@ -1,0 +1,11 @@
+{
+  "name": "kiein-roland-website-preview",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/language.test.cjs",
+    "test:browser": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.60.0"
+  }
+}
