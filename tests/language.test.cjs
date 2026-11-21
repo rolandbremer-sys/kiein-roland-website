@@ -17,7 +17,7 @@ function page(storage={},browser='cs-CZ',search='') {
  vm.createContext(context);vm.runInContext(code,context);document.ready();
  return {context,document,els,nodes,storage};
 }
-test('all 95 visible keys translated in CZ, DE and EN',()=>{
+test('all marked text translated in CZ, DE and EN',()=>{
  for(const lang of ['cs','de','en']){
   const p=page({},lang+'-CZ');
   assert.equal(p.document.documentElement.lang,lang);
@@ -53,4 +53,57 @@ test('invalid change cannot override selected language',()=>{
  const p=page({},'cs-CZ');
  assert.equal(vm.runInContext("setLanguage('ru')",p.context),false);
  assert.equal(p.document.documentElement.lang,'cs');
+});
+
+const pricing = html.match(/<section\b[^>]*\bid="pricing">([\s\S]*?)<\/section>/)[1];
+
+test('approved net EUR prices and recurring intervals are consistent across all language views', () => {
+  const approvedPlans = [
+    ['test', 2, 'week'],
+    ['solo', 20, 'month'],
+    ['team-5', 89, 'month'],
+    ['team-10', 159, 'month'],
+    ['team-20', 289, 'month'],
+    ['business-50', 649, 'month'],
+    ['owner-start', 29, 'month'],
+    ['owner-25', 99, 'month'],
+    ['owner-100', 299, 'month'],
+    ['owner-250', 599, 'month'],
+  ];
+  const cards = [...pricing.matchAll(/<article class="price" data-plan="([^"]+)">([\s\S]*?)<\/article>/g)];
+  const displayedPlans = cards.map(([, plan, card]) => {
+    const [, amount, interval] = card.match(/class="amount">(\d+) € <small data-i="(week|month)">/);
+    return [plan, Number(amount), interval];
+  });
+  assert.deepEqual(displayedPlans, approvedPlans);
+  const disclosures = {
+    de: [/EUR netto/, /Wochenabo.*jede Woche.*gekündigt/, '/ Woche', '/ Monat'],
+    cs: [/EUR bez DPH/, /předplatné.*každý týden.*zrušení/, '/ týden', '/ měsíc'],
+    en: [/EUR, exclusive of applicable VAT/, /subscription.*every week.*canceled/, '/ week', '/ month'],
+  };
+  for (const [language, [tax, renewal, week, month]] of Object.entries(disclosures)) {
+    const localized = Object.fromEntries(page({}, language).nodes.map(node => [node.dataset.i, node.textContent]));
+    assert.match(localized.pricingText, tax);
+    assert.match(localized.testDesc, renewal);
+    assert.equal(localized.week, week);
+    assert.equal(localized.month, month);
+    assert.match(localized.soloDesc, /^1 /);
+    assert.match(localized.pricingFine, /50.*250/);
+  }
+});
+
+test('pricing preview contains no payment links, forms or checkout controls', () => {
+  assert.doesNotMatch(pricing, /<(?:a|form|button|iframe)\b/i);
+  assert.doesNotMatch(html + code, /buy\.stripe\.com|checkout\.stripe\.com|price_[a-z0-9]+/i);
+});
+
+test('preview styles and scripts ship with the page under a GitHub Pages project path', () => {
+  const project = new URL('https://example.test/kiein-roland-website/');
+  const assets = [...html.matchAll(/(?:<script\s+src|<link rel="stylesheet" href)="([^"]+)"/g)].map(([, asset]) => asset);
+  assert.deepEqual(assets, ['styles.css', 'script.js']);
+  for (const asset of assets) {
+    const url = new URL(asset, project);
+    assert.equal(url.href, project.href + asset);
+    assert.ok(fs.statSync(asset).isFile());
+  }
 });

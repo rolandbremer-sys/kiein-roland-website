@@ -16,7 +16,7 @@ A static, mobile-responsive, three-language (DE / CZ / EN) marketing preview wit
 - Confirm ownership and licensing of all content and product claims.
 - Replace mock interface with **real approved screenshots** only when verified.
 - Connect a real demo only after security review; do not connect production data to the public mock demo.
-- Pricing is indicative; **there is no checkout**.
+- The preview shows the ten approved net EUR plans in DE, CZ and EN. Booking opens after product approval. Run `node --test tests/language.test.cjs` to verify price and interval parity and the translated billing disclosures.
 - Static demo runs entirely in the browser and is not a functioning maintenance or diagnostic app.
 
 ## Smoke tests
