@@ -75,3 +75,18 @@ test('Czech survives fragment navigation and reload when storage access is block
   await page.getByRole('button', { name: 'Spustit simulovanou kontrolu' }).click();
   await expect(page.locator('#demoResult')).toContainText('Událost dveří');
 });
+
+test('mobile visitors can reach the company pilot and see its Czech contact and pricing', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(projectPath);
+  await page.locator('#lang').selectOption('cs');
+  await page.locator('.hero').getByRole('link', { name: 'Pilot pro firmy' }).click();
+  await expect(page).toHaveURL(url => url.hash === '#pilot');
+  const pilot = page.locator('#pilot');
+  await expect(pilot.getByRole('heading', { name: 'Pilotní program pro servisní firmy výtahů' })).toBeVisible();
+  await expect(pilot).toContainText('89 € měsíčně bez DPH');
+  await expect(pilot.getByRole('link', { name: 'Požádat o ukázku e-mailem' }))
+    .toHaveAttribute('href', /^mailto:/);
+  await page.reload();
+  await expect(pilot.getByRole('heading', { name: 'Pilotní program pro servisní firmy výtahů' })).toBeVisible();
+});
