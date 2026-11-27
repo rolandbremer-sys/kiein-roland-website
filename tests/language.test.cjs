@@ -131,10 +131,11 @@ test('preview styles and scripts ship with the page under a GitHub Pages project
 test('company pilot preserves the approved Team 5 price and uses the existing product contact', () => {
   const pilot = html.match(/<section\b[^>]*\bid="pilot"[^>]*>([\s\S]*?)<\/section>/)[1];
   const contacts = [...pilot.matchAll(/href="([^"]+)"/g)].map(match => match[1]);
-  assert.deepEqual(contacts, ['mailto:roland.bremer@seznam.cz?subject=KIein%20Roland%20B2B%20Pilot']);
+  assert.deepEqual(contacts, ['mailto:avatecaufzuege@gmail.com?subject=KIein%20Roland%20B2B%20Pilot']);
   assert.doesNotMatch(pilot, /<(?:form|button|iframe)\b/i);
   for (const language of ['de', 'cs', 'en']) {
     const localized = Object.fromEntries(page({}, language).nodes.map(node => [node.dataset.i, node.textContent]));
     assert.match(localized.pilotPlan, /Team 5.*(?:89 €|€89)/);
+    assert.match(localized.serviceSeparation, /(?:Softwarezugänge|Přístupy k softwaru|Software access)/);
   }
 });
