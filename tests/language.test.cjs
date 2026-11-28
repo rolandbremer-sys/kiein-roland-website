@@ -17,7 +17,7 @@ function page(storage={},browser='cs-CZ',search='') {
  vm.createContext(context);vm.runInContext(code,context);document.ready();
  return {context,document,els,nodes,storage};
 }
-test('all 95 visible keys translated in CZ, DE and EN',()=>{
+test('all public translation keys translated in CZ, DE and EN',()=>{
  for(const lang of ['cs','de','en']){
   const p=page({},lang+'-CZ');
   assert.equal(p.document.documentElement.lang,lang);
@@ -53,4 +53,12 @@ test('invalid change cannot override selected language',()=>{
  const p=page({},'cs-CZ');
  assert.equal(vm.runInContext("setLanguage('ru')",p.context),false);
  assert.equal(p.document.documentElement.lang,'cs');
+});
+
+test('field report app link resolves to the official Sites origin and is translated',()=>{
+ assert.match(html,/href="https:\/\/kiein-roland-monteurbericht\.roland-bremer\.chatgpt\.site\/" data-i="openApp"/);
+ for(const [lang,label] of [['de','Monteurbericht öffnen'],['cs','Otevřít montážní protokol'],['en','Open field report app']]){
+  const view=page({},lang);
+  assert.equal(view.nodes.find(node=>node.dataset.i==='openApp').textContent,label);
+ }
 });
